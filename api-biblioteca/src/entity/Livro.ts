@@ -1,25 +1,28 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-@Entity()
+@Entity("livros")
 export class Livro {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ type: "varchar", length: 200 })
     titulo: string;
 
-    @Column()
+    @Column({ type: "varchar", length: 100 })
     autor: string;
 
-    @Column()
+    @Column({ type: "varchar", length: 17, unique: true })
     isbn: string;
 
-    @Column("int")
+    @Column({ type: "int", name: "ano_publicacao" })
     anoPublicacao: number;
 
-    @Column("boolean", { default: true })
+    @Column({ type: "boolean", default: true })
     disponivel: boolean;
 
-    constructor() {    
-    }
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    dataCriacao: Date;
+
+    @Column({ type: "timestamp", nullable: true, onUpdate: "CURRENT_TIMESTAMP" })
+    dataAtualizacao: Date;
 }
