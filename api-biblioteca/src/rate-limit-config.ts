@@ -1,5 +1,17 @@
 import rateLimit from 'express-rate-limit';
 
+// Defina uma interface mínima para evitar conflitos de tipos
+interface RateLimitRequest {
+    headers: Record<string, string | string[] | undefined>;
+    ip?: string;
+    socket?: {
+        remoteAddress?: string;
+    };
+    connection?: {
+        remoteAddress?: string;
+    };
+}
+
 export const createRateLimiter = (options?: {
     windowMs?: number;
     max?: number;
@@ -12,17 +24,23 @@ export const createRateLimiter = (options?: {
         message: options?.message || 'Muitas requisições deste IP, tente novamente mais tarde',
         standardHeaders: true,
         legacyHeaders: false,
-        skip: (req) => {
+        skip: (request: RateLimitRequest) => {
             // Pular rate limiting para endpoints específicos
-            if (options?.skipKey && req.headers['x-api-key'] === options.skipKey) {
+            const apiKeyHeader = request.headers['x-api-key'];
+            const apiKey = Array.isArray(apiKeyHeader) ? apiKeyHeader[0] : apiKeyHeader;
+            
+            if (options?.skipKey && apiKey === options.skipKey) {
                 return true;
             }
             return false;
         },
-        keyGenerator: (req) => {
+        keyGenerator: (request: RateLimitRequest) => {
             // Considerar API key ou token no rate limiting
-            const apiKey = req.headers['x-api-key'] as string;
-            const token = req.headers['authorization'];
+            const apiKeyHeader = request.headers['x-api-key'];
+            const authHeader = request.headers['authorization'];
+            
+            const apiKey = Array.isArray(apiKeyHeader) ? apiKeyHeader[0] : apiKeyHeader;
+            const token = Array.isArray(authHeader) ? authHeader[0] : authHeader;
             
             if (apiKey) {
                 return apiKey;
@@ -32,7 +50,10 @@ export const createRateLimiter = (options?: {
                 return token;
             }
             
-            return req.ip || 'unknown';
+            return request.ip || 
+                   (request.socket?.remoteAddress) || 
+                   (request.connection?.remoteAddress) || 
+                   'unknown';
         }
     });
 };
