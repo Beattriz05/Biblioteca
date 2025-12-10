@@ -47,7 +47,8 @@ export class LivroRepository {
 
     async delete(id: number): Promise<boolean> {
         const result = await this.repository.delete(id);
-        return result.affected !== null && result.affected > 0;
+        // Correção: verificar se affected existe e é um número
+        return (result.affected ?? 0) > 0;
     }
 
     async findByAutor(autor: string): Promise<Livro[]> {

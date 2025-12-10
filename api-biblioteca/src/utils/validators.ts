@@ -951,8 +951,10 @@ export const LivroValidators = {
     
     // Apenas valida campos que estão presentes
     Object.keys(livroData).forEach(key => {
-      if (ValidationSchemas.livro[key]) {
-        const rule = { ...ValidationSchemas.livro[key] };
+      // Verifica se a chave existe no schema de livro
+      const livroSchema = ValidationSchemas.livro as Record<string, any>;
+      if (livroSchema[key]) {
+        const rule = { ...livroSchema[key] };
         rule.required = false; // Em atualização, campos não são obrigatórios
         schema[key] = rule;
       }
