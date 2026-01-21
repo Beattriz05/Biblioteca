@@ -27,3 +27,25 @@ O projeto foi estruturado para garantir performance e facilidade de manutenção
 - Segurança: Helmet, Express-Rate-Limit, CORS
 
 - Logs: Morgan
+
+🪻 Como Iniciar
+
+1. Instalação
+
+```
+npm install
+```
+
+2. Configuração
+
+O sistema já vem configurado para rodar localmente por padrão, mas você pode customizar as portas no arquivo .env.
+
+3. Execução
+
+```
+# Modo Desenvolvimento
+npm run dev
+
+# Modo Produção
+npm run build && npm start
+```
